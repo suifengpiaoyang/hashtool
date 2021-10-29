@@ -23,18 +23,23 @@ def main():
 
     available_methods_format = ', '.join(available_methods)
     parser = argparse.ArgumentParser(
-        description='hash file with different method')
+        description='hash file or text with different method')
     parser.add_argument('file', help='target file')
+    parser.add_argument('-t', '--text', action='store_true',
+                        help='hash a text instead a file')
     parser.add_argument('method',
                         help=f'the following methods are availalbe: {available_methods_format}')
 
     args = parser.parse_args()
 
     path = args.file
-    if not os.path.exists(path):
-        show_message(f'错误:目标文件不存在:{path}')
     if args.method not in available_methods:
         show_message(f'错误：不支持这种哈希方式：{args.method}')
-    with open(path, 'rb')as fl:
-        data = fl.read()
+    if args.text:
+        data = path.encode()
+    else:
+        if not os.path.exists(path):
+            show_message(f'错误:目标文件不存在:{path}')
+        with open(path, 'rb')as fl:
+            data = fl.read()
     print(get_hash_value(data, args.method))
